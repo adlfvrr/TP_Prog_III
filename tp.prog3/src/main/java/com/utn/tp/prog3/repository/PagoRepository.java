@@ -1,0 +1,12 @@
+package com.utn.tp.prog3.repository;
+
+import com.utn.tp.prog3.model.Pago;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface PagoRepository extends JpaRepository<Pago, Long> {
+
+    List<Pago> findByIdTercero(Long idTercero);
+
+}
