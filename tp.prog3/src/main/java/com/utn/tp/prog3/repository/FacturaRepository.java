@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface FacturaRepository extends JpaRepository<Factura, Long> {
 
-    Optional<Factura> findByIdFactura(Long idTercero);
+    Optional<Factura> findByIdFactura(Long idFactura);
     Optional<Factura> findByNumero(int numero);
 }

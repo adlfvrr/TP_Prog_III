@@ -1,0 +1,8 @@
+Notas para trabajar pagos.
+
+La idea es repetir el mismo procedimiento (con ligeras diferencias) que se hizo con las facturas.
+Request: AddPagoRequest, AddPagoDetalleRequest -> No tiene sentido un update, puesto que los pagos no se modifican
+Response: PagoResponse, PagoDetalleResponse, CompletePagoResponse
+
+¿Cuál es la "ligera diferencia"?
+Los pagos solo contendrán un PagoDetalle, además que se deberán vincular a terceros.

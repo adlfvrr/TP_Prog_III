@@ -119,35 +119,8 @@ public class FacturaServiceImpl implements IFacturaService {
         if(request.getItemRequestList().isEmpty()){
             throw new IllegalArgumentException("La factura debe contener al menos un item");
         }
-        //Primero creamos los items de factura
-        //Recorremos los items del request y creamos las entidades a persistir
-        for(AddFacturaItemRequest itemRequest : request.getItemRequestList()){
-            FacturaItem item = new FacturaItem();
-            //Verificaciones
 
-            if(itemRequest.getId_factura() == null || itemRequest.getId_factura() <= 0){
-                throw new IllegalArgumentException("El id no puede ser nulo/menor o igual a cero");
-            }
-            if(itemRequest.getMonto() < 0){
-                throw new IllegalArgumentException("No puede haber monto negativo en facturas");
-            }
-            if(itemRequest.getCantidad() <= 0){
-                throw new IllegalArgumentException("No puede haber cantidad negativa o igual a cero");
-            }
-            if(itemRequest.getDetalle().isBlank()){
-                throw new IllegalArgumentException("El item debe contener detalles");
-            }
-
-            //Seteamos y persistimos
-
-            item.setId_factura(itemRequest.getId_factura());
-            item.setCantidad(itemRequest.getCantidad());
-            item.setMonto(itemRequest.getMonto());
-            item.setDetalle(itemRequest.getDetalle());
-            this.facturaItemRepository.save(item);
-        }
-
-        //Creamos la factura
+        //Primero crearemos la factura, pues necesitamos su id para asignarselo a sus items
         Factura f = new Factura();
 
         //Verificaciones
@@ -164,8 +137,32 @@ public class FacturaServiceImpl implements IFacturaService {
         f.setFecha_factura(request.getFecha_factura());
         f.setNumero(request.getNumero());
         f.setId_tecero(request.getId_tecero());
+        Factura savedEntity = this.facturaRepository.save(f);
 
-        return this.mapFacturaToResponse(this.facturaRepository.save(f));
+        //Ahora recorremos los items y asignamos el id
+        for(AddFacturaItemRequest itemRequest : request.getItemRequestList()){
+            FacturaItem item = new FacturaItem();
+
+            //Verificaciones
+            if(itemRequest.getMonto() < 0){
+                throw new IllegalArgumentException("No puede haber monto negativo en facturas");
+            }
+            if(itemRequest.getCantidad() <= 0){
+                throw new IllegalArgumentException("No puede haber cantidad negativa o igual a cero");
+            }
+            if(itemRequest.getDetalle().isBlank()){
+                throw new IllegalArgumentException("El item debe contener detalles");
+            }
+
+            //Seteamos y persistimos
+            item.setId_factura(savedEntity.getId_factura()); //Importante, asignar el id de nuestra factura guardada
+            item.setCantidad(itemRequest.getCantidad());
+            item.setMonto(itemRequest.getMonto());
+            item.setDetalle(itemRequest.getDetalle());
+            this.facturaItemRepository.save(item);
+        }
+
+        return this.mapFacturaToResponse(savedEntity);
     }
 
     @Override
