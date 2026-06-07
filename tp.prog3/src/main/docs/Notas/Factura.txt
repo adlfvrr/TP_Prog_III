@@ -1,0 +1,18 @@
+Anotaciones para trabajar con factura.
+
+"Construir una interfaz CRUD para el manejo de Facturas. Tener en cuenta que una Factura posee 1 Items que la conforma;
+ y además, al registrar una factura, la misma está vinculada a un proveedor o tercero."
+
+- Vinculo entre facturas y terceros -> id_tercero
+- La factura posee al menos 1 item.
+- Vincular factura al momento de su registro (creación)
+
+Método AddFactura -> Dentro se debe crear la factura y el item que la conforma -> En el request se deben hallar items -> List<FacturaItem>
+-> vincularlos una vez creados mediante el id
+
+Por lo tanto, se debe crear:
+AddFacturaRequest -> DTO request para añadir facturas
+AddFacturaItemRequest -> DTO request para añadir items a una factura -> Es una lista dentro del request de AddFacturaRequest
+
+Sin embargo, los items de una factura persisten solo si hay una factura, por lo tanto, su persistencia se dicta desde la creación
+de una factura -> No necesitan servicio, pues van implicitamente en el servicio de facturas (FacturaServiceImpl)

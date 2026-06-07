@@ -10,6 +10,7 @@ import com.utn.tp.prog3.repository.TerceroRepository;
 import com.utn.tp.prog3.service.Iservices.ITerceroService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,6 +53,7 @@ public class TerceroServiceImpl implements ITerceroService {
                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró el tercero con id " + id)));
     }
 
+    @Transactional
     @Override
     public TerceroResponse addTercero(AddTerceroRequest request) {
         //Verificamos si existe -> por CUIT
@@ -87,6 +89,7 @@ public class TerceroServiceImpl implements ITerceroService {
 
     }
 
+    @Transactional
     @Override
     public TerceroResponse updateTercero(UpdateTerceroRequest request, Long id) {
         if(id == null || id <= 0){

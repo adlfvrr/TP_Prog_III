@@ -1,7 +1,6 @@
 package com.utn.tp.prog3.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,8 +21,7 @@ public class FacturaItem {
     @ManyToOne
     @JoinColumn(name = "id_factura")
     private Long id_factura;
-    @Column(name = "detalle")
-    @Size(max = 300)
+    @Column(name = "detalle",length = 300)
     private String detalle;
 
 

@@ -9,10 +9,13 @@ import com.utn.tp.prog3.model.Facultad;
 import com.utn.tp.prog3.repository.FacultadRepository;
 import com.utn.tp.prog3.service.Iservices.IFacultadService;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 @AllArgsConstructor
 public class FacultadServiceImpl implements IFacultadService {
 
@@ -47,6 +50,8 @@ public class FacultadServiceImpl implements IFacultadService {
         return this.mapToResponse(this.facultadRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No se encontró la facultad buscada")));
     }
 
+    @Transactional
+    @Override
     public FacultadResponse addFacultad(AddFacultadRequest request){
         //Verificamos primero si no existe por el CUIT
 
@@ -79,6 +84,8 @@ public class FacultadServiceImpl implements IFacultadService {
         return this.mapToResponse(facultadRepository.save(f));
     }
 
+    @Override
+    @Transactional
     public FacultadResponse updateFacultad(UpdateFacultadRequest request, Long id){
 
         if(id == null || id <= 0){
@@ -110,6 +117,7 @@ public class FacultadServiceImpl implements IFacultadService {
         return this.mapToResponse(facultadRepository.save(f));
     }
 
+    @Override
     public void deleteFacultad(Long id){
         if(id == null || id <= 0){
             throw new IllegalArgumentException("El id no puede ser nulo o menor/igual a cero");

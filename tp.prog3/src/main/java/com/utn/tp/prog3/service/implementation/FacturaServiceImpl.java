@@ -1,6 +1,178 @@
 package com.utn.tp.prog3.service.implementation;
 
+import com.utn.tp.prog3.dto.request.AddFacturaItemRequest;
+import com.utn.tp.prog3.dto.request.AddFacturaRequest;
+import com.utn.tp.prog3.dto.response.CompleteFacturaResponse;
+import com.utn.tp.prog3.dto.response.FacturaItemResponse;
+import com.utn.tp.prog3.dto.response.FacturaResponse;
+import com.utn.tp.prog3.exception.EntityAlreadyExistsException;
+import com.utn.tp.prog3.exception.ResourceNotFoundException;
+import com.utn.tp.prog3.model.Factura;
+import com.utn.tp.prog3.model.FacturaItem;
+import com.utn.tp.prog3.repository.FacturaItemRepository;
+import com.utn.tp.prog3.repository.FacturaRepository;
 import com.utn.tp.prog3.service.Iservices.IFacturaService;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@AllArgsConstructor
+@Service
 public class FacturaServiceImpl implements IFacturaService {
+
+    private FacturaRepository facturaRepository;
+    private FacturaItemRepository facturaItemRepository;
+
+    //Método mapper
+    private FacturaResponse mapFacturaToResponse(Factura entity){
+        return new FacturaResponse(
+                entity.getId_factura(),
+                entity.getFecha_factura(),
+                entity.getId_tecero(),
+                entity.getNumero()
+        );
+    }
+    private FacturaItemResponse mapFacturaItemToResponse(FacturaItem entity){
+        return new FacturaItemResponse(
+                entity.getId_items(),
+                entity.getMonto(),
+                entity.getCantidad(),
+                entity.getId_factura(),
+                entity.getDetalle()
+        );
+    }
+
+    @Override
+    public List<FacturaResponse> findAll() {
+        return this.facturaRepository.findAll().stream()
+                .map(this::mapFacturaToResponse)
+                .collect(Collectors.toList());
+    }
+
+    //Ahora un findAll y findById que me devuelva tanto facturas como sus items
+
+    @Override
+    public List<CompleteFacturaResponse> findAllComplete(){
+        return this.facturaRepository.findAll().stream()
+                .map(factura -> { //Aplico lambda -un poco largo- para poder convertir los items y la factura en response y mapearlos
+                    //Mapeo y obtengo lista mapeada
+                    List<FacturaItemResponse> itemResponses = this.facturaItemRepository.findByIdFactura(factura.getId_factura()).stream()
+                            .map(this::mapFacturaItemToResponse)
+                            .collect(Collectors.toList());
+                    //Mapeo a CompleteFacturaResponse
+                    return new CompleteFacturaResponse(
+                            factura.getId_factura(),
+                            factura.getFecha_factura(),
+                            factura.getId_tecero(),
+                            factura.getNumero(),
+                            itemResponses
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CompleteFacturaResponse findByIdComplete(Long idFactura){
+        if(idFactura == null || idFactura <= 0){
+            throw new IllegalArgumentException("El id no puede ser nulo/menor o igual a cero");
+        }
+
+        //Ahora hay que encontrar tanto la factura como los items y mapearlo
+        Factura f = this.facturaRepository.findByIdFactura(idFactura)
+                .orElseThrow(() -> new ResourceNotFoundException("Factura no encontrada con id " + idFactura));
+
+        List<FacturaItemResponse> itemResponses = this.facturaItemRepository.findByIdFactura(idFactura).stream()
+                .map(this::mapFacturaItemToResponse)
+                .collect(Collectors.toList());
+
+        return new CompleteFacturaResponse(
+                f.getId_factura(),
+                f.getFecha_factura(),
+                f.getId_tecero(),
+                f.getNumero(),
+                itemResponses
+        );
+
+    }
+    @Override
+    public FacturaResponse findById(Long id) {
+        if(id == null || id <= 0){
+            throw new IllegalArgumentException("El id no puede ser nulo/menor o igual a cero");
+        }
+        return this.mapFacturaToResponse(this.facturaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Factura no encontrada con id " + id)));
+    }
+
+    @Transactional
+    @Override
+    public FacturaResponse addFactura(AddFacturaRequest request) {
+
+        //Comprobamos existencia de factura mediante su numero
+        if(this.facturaRepository.findByNumero(request.getNumero()).isPresent()){
+            throw new EntityAlreadyExistsException("La factura ya existe con número " + request.getNumero());
+        }
+        //Ahora debemos crear tanto la factura como los items y persistirlos
+        //Verificamos que tenga items
+        if(request.getItemRequestList().isEmpty()){
+            throw new IllegalArgumentException("La factura debe contener al menos un item");
+        }
+        //Primero creamos los items de factura
+        //Recorremos los items del request y creamos las entidades a persistir
+        for(AddFacturaItemRequest itemRequest : request.getItemRequestList()){
+            FacturaItem item = new FacturaItem();
+            //Verificaciones
+
+            if(itemRequest.getId_factura() == null || itemRequest.getId_factura() <= 0){
+                throw new IllegalArgumentException("El id no puede ser nulo/menor o igual a cero");
+            }
+            if(itemRequest.getMonto() < 0){
+                throw new IllegalArgumentException("No puede haber monto negativo en facturas");
+            }
+            if(itemRequest.getCantidad() <= 0){
+                throw new IllegalArgumentException("No puede haber cantidad negativa o igual a cero");
+            }
+            if(itemRequest.getDetalle().isBlank()){
+                throw new IllegalArgumentException("El item debe contener detalles");
+            }
+
+            //Seteamos y persistimos
+
+            item.setId_factura(itemRequest.getId_factura());
+            item.setCantidad(itemRequest.getCantidad());
+            item.setMonto(itemRequest.getMonto());
+            item.setDetalle(itemRequest.getDetalle());
+            this.facturaItemRepository.save(item);
+        }
+
+        //Creamos la factura
+        Factura f = new Factura();
+
+        //Verificaciones
+        if(request.getNumero() <= 0){
+            throw new IllegalArgumentException("El número de la factura debe ser mayor a 0");
+        }
+        if(request.getFecha_factura() == null){
+            throw new IllegalArgumentException("La fecha debe ser válida");
+        }
+        if(request.getId_tecero() == null || request.getId_tecero() <= 0){
+            throw new IllegalArgumentException("El id no puede ser nulo/menor o igual a cero");
+        }
+
+        f.setFecha_factura(request.getFecha_factura());
+        f.setNumero(request.getNumero());
+        f.setId_tecero(request.getId_tecero());
+
+        return this.mapFacturaToResponse(this.facturaRepository.save(f));
+    }
+
+    @Override
+    public void deleteFactura(Long id) {
+        if(id == null || id <= 0){
+            throw new IllegalArgumentException("El id no puede ser nulo/menor o igual a cero");
+        }
+        this.facturaRepository.deleteById(id);
+    }
 }
