@@ -1,0 +1,12 @@
+Anotaciones para trabajar con terceros.
+
+"Construir una interfaz CRUD para el manejo de Proveedores (Terceros)"
+
+Para continuar con la consigna, seguiremos le mismo procedimiento que con las facultades, es decir, dos request para:
+- Crear terceros -> AddTerceroRequest
+- Actualizar terceros -> UpdateTerceroRequest
+
+Para el Response, se utilizará uno solo para ámbos -> TerceroResponse
+
+Al igual que con las facultades, a los terceros se los puede distinguir por CUIT, asi que también se agregará un método
+al repositorio de findByCuit.

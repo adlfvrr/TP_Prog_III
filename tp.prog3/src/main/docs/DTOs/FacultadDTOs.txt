@@ -1,0 +1,18 @@
+Anotaciones para trabajar con facultades.
+
+"Construir una interfaz para Crear o Actualizar datos de la Facultad."
+
+Se necesita primero mostrar una facultad, sin exponer su id de base de datos (RESPONSE).
+
+Se necesitan 2 request para:
+- Crear datos para la facultad -> AddFacultadRequest
+- Actualizar datos de facultades -> UpdateFacultadRequest
+
+Si bien se podrían unificar los 2 para no ser redundante, lo que los distinguirán son las Bean Validation.
+La forma para actualizar será verificando que campos no están vacíos (Si no está vacío, se modificará ese de la entidad original).
+Determinados datos no son posibles de verificar debido a las Validation, por lo tanto, se utilizarán distintas request.
+
+Para mostrar los datos de la facultad, solo es necesario un response -> FacultadResponse
+
+Sin embargo, es necesario para crear facultades, verificar que una facultad no exista. Un dato único de las facultades es el CUIT,
+por lo tanto, se utilizará un método que JPA autoimplementará que es findByCuit.
