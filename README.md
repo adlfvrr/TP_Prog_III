@@ -15,7 +15,7 @@ En este repositorio estaré trabajando con un trabajo práctico académico para 
 📚En el trabajo se solicita las siguientes tecnologías:
 - Java como lenguaje Backend, Spring como framework.
 - Vaadin Flow/Hilla como Frontend (+25)
-- PostrgreSQL como motor de BDD (gestión con DBeaver)
+- PostgreSQL como motor de BDD (gestión con DBeaver)
 - Autenticación con tokens (en mi caso utilizaré JWT)
 
 # REPOSITORIO PURAMENTE ACADÉMICO
