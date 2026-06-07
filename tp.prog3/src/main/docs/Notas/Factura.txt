@@ -16,3 +16,7 @@ AddFacturaItemRequest -> DTO request para añadir items a una factura -> Es una 
 
 Sin embargo, los items de una factura persisten solo si hay una factura, por lo tanto, su persistencia se dicta desde la creación
 de una factura -> No necesitan servicio, pues van implicitamente en el servicio de facturas (FacturaServiceImpl)
+
+Resueltos los request y Response, solo me falta unir dentro de un Response las facturas y los items, e implementar 2 métodos que permitan
+devolver todas las facturas con todos sus items y lo mismo pero según un id.
+Por lo tanto, vamos a crear un Response que unifique los otros 2 -> CompleteFacturaResponse
