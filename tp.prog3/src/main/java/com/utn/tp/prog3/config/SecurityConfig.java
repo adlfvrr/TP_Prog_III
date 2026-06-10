@@ -38,10 +38,8 @@ public class SecurityConfig {
                 // Configurar acceso a endpoints
                 .authorizeHttpRequests(auth -> auth
                         // Endpoints públicos
-                        .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/api/debug/**").permitAll()
-                        .requestMatchers("/api/shoes/**", "/api/clothing/**").permitAll()
-                        // Endpoints de carrito y pedidos requieren autenticación
-                        .requestMatchers("/api/cart/**", "/api/orders/**").authenticated()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/").authenticated()
                         // Admin solo para ciertos endpoints (lo manejaremos con anotaciones en controladores)
                         .anyRequest().authenticated()
                 )

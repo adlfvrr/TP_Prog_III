@@ -1,6 +1,7 @@
 package com.utn.tp.prog3.config;
 
 import com.utn.tp.prog3.service.jwt.JwtTokenProvider;
+import com.utn.tp.prog3.service.jwt.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     //Creamos un filtrado de usuarios Autenticados
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserDetailsServiceImpl userDetailsService;
 
     //Para entender mejor, visita mi repositorio de register-login-api, todo está detallado
     @Override
@@ -40,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String username = jwtTokenProvider.getUsernameFromToken(token);
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if(jwtTokenProvider.validateToken(token)){
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 

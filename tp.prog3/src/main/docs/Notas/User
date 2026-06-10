@@ -1,0 +1,11 @@
+Anotaciones para trabajar con usuarios
+
+Se utilizarán JWT para la autenticación de usuarios, con 2 roles: ADMIN y USUARIO, donde los admin podrán realizar altas, bajas y modificaciones
+de datos, mientras que los usuarios solo podrán leer.
+
+Los usuarios contarán con un registro y login de username y contraseña, para hacerlo de manera simple.
+
+Por lo tanto, hace falta una autenticación a la ruta /auth, por lo tanto hace falta un request y un response
+
+Request -> UserAuthRequest
+Response -> UserAuthResponse
