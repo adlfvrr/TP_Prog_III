@@ -1,5 +1,8 @@
 vaadin.launch-browser=true
 spring.application.name=tp.prog3
+vaadin.security.disable-automatic-login-redirect=true
+//Establezco el mapeo de la URL para que todas las rutas de Vaadin estén bajo /ui/*, para evitar conflictos con la api REST
+vaadin.url-mapping=/ui/*
 
 //PostgreSQL config
 spring.datasource.url=jdbc:postgresql://localhost:5432/your_db

@@ -1,0 +1,4 @@
+Anotaciones para trabajar el back y el front
+
+Mi idea es separar ambas partes, donde desde el back se expongan una serie de endpoints para que el front pueda consumirlos, y el front se encargue de la parte visual y de interacción con el usuario.
+Por lo tanto, es necesario trabajar servicios desde el front para que interactúen con los servicios del back, y la autenticación también tiene una implementación extra.
