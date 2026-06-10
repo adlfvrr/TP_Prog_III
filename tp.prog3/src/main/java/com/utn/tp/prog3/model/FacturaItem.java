@@ -13,14 +13,13 @@ public class FacturaItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_items;
-    @Column(nullable = false, name = "monto", precision = 8, scale = 2)
+    @Column(nullable = false, name = "monto")
     private double monto;
-    @Column(nullable = false, name = "cantidad", precision = 9, scale = 3)
+    @Column(nullable = false, name = "cantidad")
     private double cantidad;
-    @Column(nullable = false, name = "id_factura")
     @ManyToOne
     @JoinColumn(name = "id_factura")
-    private Long id_factura;
+    private Factura factura;
     @Column(name = "detalle",length = 300)
     private String detalle;
 

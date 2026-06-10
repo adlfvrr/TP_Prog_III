@@ -14,7 +14,7 @@ public class CompleteFacturaResponse {
 
     private Long id_factura;
     private Date fecha_factura;
-    private Long id_tecero;
+    private Long id_tercero;
     private int numero;
     private List<FacturaItemResponse> itemResponseList;
 

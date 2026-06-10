@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface FacturaItemRepository extends JpaRepository<FacturaItem, Long> {
 
-    List<FacturaItem> findByIdFactura(Long facturaId);
+    List<FacturaItem> findByFacturaId(Long facturaId);
 
 }

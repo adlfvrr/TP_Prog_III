@@ -11,6 +11,7 @@ import com.utn.tp.prog3.model.Factura;
 import com.utn.tp.prog3.model.FacturaItem;
 import com.utn.tp.prog3.repository.FacturaItemRepository;
 import com.utn.tp.prog3.repository.FacturaRepository;
+import com.utn.tp.prog3.repository.TerceroRepository;
 import com.utn.tp.prog3.service.Iservices.IFacturaService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,13 +26,14 @@ public class FacturaServiceImpl implements IFacturaService {
 
     private FacturaRepository facturaRepository;
     private FacturaItemRepository facturaItemRepository;
+    private TerceroRepository terceroRepository;
 
     //Método mapper
     private FacturaResponse mapFacturaToResponse(Factura entity){
         return new FacturaResponse(
-                entity.getId_factura(),
+                entity.getId(),
                 entity.getFecha_factura(),
-                entity.getId_tecero(),
+                entity.getTercero().getId_tercero(),
                 entity.getNumero()
         );
     }
@@ -40,7 +42,7 @@ public class FacturaServiceImpl implements IFacturaService {
                 entity.getId_items(),
                 entity.getMonto(),
                 entity.getCantidad(),
-                entity.getId_factura(),
+                entity.getFactura().getId(),
                 entity.getDetalle()
         );
     }
@@ -59,14 +61,14 @@ public class FacturaServiceImpl implements IFacturaService {
         return this.facturaRepository.findAll().stream()
                 .map(factura -> { //Aplico lambda -un poco largo- para poder convertir los items y la factura en response y mapearlos
                     //Mapeo y obtengo lista mapeada
-                    List<FacturaItemResponse> itemResponses = this.facturaItemRepository.findByIdFactura(factura.getId_factura()).stream()
+                    List<FacturaItemResponse> itemResponses = this.facturaItemRepository.findByFacturaId(factura.getId()).stream()
                             .map(this::mapFacturaItemToResponse)
                             .collect(Collectors.toList());
                     //Mapeo a CompleteFacturaResponse
                     return new CompleteFacturaResponse(
-                            factura.getId_factura(),
+                            factura.getId(),
                             factura.getFecha_factura(),
-                            factura.getId_tecero(),
+                            factura.getTercero().getId_tercero(),
                             factura.getNumero(),
                             itemResponses
                     );
@@ -81,17 +83,17 @@ public class FacturaServiceImpl implements IFacturaService {
         }
 
         //Ahora hay que encontrar tanto la factura como los items y mapearlo
-        Factura f = this.facturaRepository.findByIdFactura(idFactura)
+        Factura f = this.facturaRepository.findById(idFactura)
                 .orElseThrow(() -> new ResourceNotFoundException("Factura no encontrada con id " + idFactura));
 
-        List<FacturaItemResponse> itemResponses = this.facturaItemRepository.findByIdFactura(idFactura).stream()
+        List<FacturaItemResponse> itemResponses = this.facturaItemRepository.findByFacturaId(idFactura).stream()
                 .map(this::mapFacturaItemToResponse)
                 .collect(Collectors.toList());
 
         return new CompleteFacturaResponse(
-                f.getId_factura(),
+                f.getId(),
                 f.getFecha_factura(),
-                f.getId_tecero(),
+                f.getTercero().getId_tercero(),
                 f.getNumero(),
                 itemResponses
         );
@@ -136,7 +138,8 @@ public class FacturaServiceImpl implements IFacturaService {
 
         f.setFecha_factura(request.getFecha_factura());
         f.setNumero(request.getNumero());
-        f.setId_tecero(request.getId_tecero());
+        f.setTercero(this.terceroRepository.findById(request.getId_tecero())
+                .orElseThrow(() -> new ResourceNotFoundException("Tercero no encontrado con id " + request.getId_tecero())));
         Factura savedEntity = this.facturaRepository.save(f);
 
         //Ahora recorremos los items y asignamos el id
@@ -155,7 +158,7 @@ public class FacturaServiceImpl implements IFacturaService {
             }
 
             //Seteamos y persistimos
-            item.setId_factura(savedEntity.getId_factura()); //Importante, asignar el id de nuestra factura guardada
+            item.setFactura(savedEntity); //Importante, asignar el id de nuestra factura guardada
             item.setCantidad(itemRequest.getCantidad());
             item.setMonto(itemRequest.getMonto());
             item.setDetalle(itemRequest.getDetalle());

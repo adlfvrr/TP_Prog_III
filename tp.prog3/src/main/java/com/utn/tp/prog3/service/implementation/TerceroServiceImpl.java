@@ -26,7 +26,7 @@ public class TerceroServiceImpl implements ITerceroService {
         return new TerceroResponse(
                 entity.getId_tercero(),
                 entity.getNombre(),
-                entity.getCuitl(),
+                entity.getCuit(),
                 entity.getSitIVA(),
                 entity.getDireccion(),
                 entity.getLocalidad(),
@@ -77,7 +77,7 @@ public class TerceroServiceImpl implements ITerceroService {
         Tercero t = new Tercero();
         t.setNombre(request.getNombre());
         t.setDireccion(request.getDireccion());
-        t.setCuitl(request.getCuitl());
+        t.setCuit(request.getCuitl());
         t.setSitIVA(request.getSitIVA());
         t.setLocalidad(request.getLocalidad());
         t.setProvincia(request.getProvincia());
@@ -105,7 +105,7 @@ public class TerceroServiceImpl implements ITerceroService {
             t.setDireccion(request.getDireccion());
         }
         if(!request.getCuitl().isBlank()){
-            t.setCuitl(request.getCuitl());
+            t.setCuit(request.getCuitl());
         }
         if(!request.getLocalidad().isBlank()){
             t.setLocalidad(request.getLocalidad());

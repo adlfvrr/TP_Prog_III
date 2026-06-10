@@ -7,6 +7,5 @@ import java.util.Optional;
 
 public interface PagoRepository extends JpaRepository<Pago, Long> {
 
-    Optional<Pago> findByIdPago(Long id);
 
 }

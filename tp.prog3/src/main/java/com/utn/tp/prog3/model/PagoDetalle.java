@@ -23,9 +23,8 @@ public class PagoDetalle {
     private String banco;
     @Column(name = "pagorealizado")
     private boolean pagoRealizado = false;
-    @Column(name = "id_pagos", nullable = false)
     @ManyToOne
     @JoinColumn(name = "id_pago")
-    private Long id_pago;
+    private Pago pago;
 
 }

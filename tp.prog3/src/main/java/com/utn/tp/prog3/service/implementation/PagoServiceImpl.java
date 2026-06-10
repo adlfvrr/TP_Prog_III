@@ -3,11 +3,11 @@ package com.utn.tp.prog3.service.implementation;
 import com.utn.tp.prog3.dto.request.AddPagoRequest;
 import com.utn.tp.prog3.dto.response.*;
 import com.utn.tp.prog3.exception.ResourceNotFoundException;
-import com.utn.tp.prog3.model.Factura;
 import com.utn.tp.prog3.model.Pago;
 import com.utn.tp.prog3.model.PagoDetalle;
 import com.utn.tp.prog3.repository.PagoDetalleRepository;
 import com.utn.tp.prog3.repository.PagoRepository;
+import com.utn.tp.prog3.repository.TerceroRepository;
 import com.utn.tp.prog3.service.Iservices.IPagoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,12 +22,13 @@ public class PagoServiceImpl implements IPagoService {
 
     private PagoRepository pagoRepository;
     private PagoDetalleRepository pagoDetalleRepository;
+    private TerceroRepository terceroRepository;
 
     //Método mapper
     private PagoResponse mapToResponse(Pago entity){
         return new PagoResponse(
-                entity.getId_pagos(),
-                entity.getId_tercero(),
+                entity.getId(),
+                entity.getTercero().getId_tercero(),
                 entity.getFecha_pago(),
                 entity.getMonto_pago(),
                 entity.getModo_pago()
@@ -41,7 +42,7 @@ public class PagoServiceImpl implements IPagoService {
                 entity.getInstrumentDate(),
                 entity.getBanco(),
                 entity.isPagoRealizado(),
-                entity.getId_pago()
+                entity.getPago().getId()
         );
     }
 
@@ -56,10 +57,10 @@ public class PagoServiceImpl implements IPagoService {
     public List<CompletePagoResponse> findAllComplete() {
         return this.pagoRepository.findAll().stream()
                 .map(pago -> {
-                    PagoDetalleResponse detalleResponse = this.mapToDetalleResponse(this.pagoDetalleRepository.findByIdPago(pago.getId_pagos()));
+                    PagoDetalleResponse detalleResponse = this.mapToDetalleResponse(this.pagoDetalleRepository.findByPagoId(pago.getId()));
                     return new CompletePagoResponse(
-                            pago.getId_pagos(),
-                            pago.getId_tercero(),
+                            pago.getId(),
+                            pago.getTercero().getId_tercero(),
                             pago.getFecha_pago(),
                             pago.getMonto_pago(),
                             pago.getModo_pago(),
@@ -75,14 +76,14 @@ public class PagoServiceImpl implements IPagoService {
             throw new IllegalArgumentException("El id no puede ser nulo/menor o igual a cero");
         }
 
-        Pago p = this.pagoRepository.findByIdPago(idPago)
+        Pago p = this.pagoRepository.findById(idPago)
                 .orElseThrow(() -> new ResourceNotFoundException("Pago no encontrado con id " + idPago));
 
-        PagoDetalleResponse detalleResponse = this.mapToDetalleResponse(this.pagoDetalleRepository.findByIdPago(idPago));
+        PagoDetalleResponse detalleResponse = this.mapToDetalleResponse(this.pagoDetalleRepository.findByPagoId(idPago));
 
         return new CompletePagoResponse(
-                p.getId_pagos(),
-                p.getId_tercero(),
+                p.getId(),
+                p.getTercero().getId_tercero(),
                 p.getFecha_pago(),
                 p.getMonto_pago(),
                 p.getModo_pago(),
@@ -123,7 +124,8 @@ public class PagoServiceImpl implements IPagoService {
         p.setFecha_pago(request.getFecha_pago());
         p.setModo_pago(request.getModo_pago());
         p.setMonto_pago(request.getMonto_pago());
-        p.setId_tercero(request.getId_tercero());
+        p.setTercero(this.terceroRepository.findById(request.getId_tercero())
+                .orElseThrow(() -> new ResourceNotFoundException("Tercero no encontrado con id " + request.getId_tercero())));
         Pago savedEntity = this.pagoRepository.save(p); //Persistimos para obtener id
 
         //Verificamos
@@ -134,7 +136,7 @@ public class PagoServiceImpl implements IPagoService {
             throw new IllegalArgumentException("El instrument number es obligatorio");
         }
         //Asignamos los detalles y el id
-        pDetalle.setId_pago(savedEntity.getId_pagos());
+        pDetalle.setPago(savedEntity);
         pDetalle.setPagoRealizado(request.getDetalleRequest().isPagoRealizado());
         pDetalle.setBanco(request.getDetalleRequest().getBanco());
         pDetalle.setInstrumentDate(request.getDetalleRequest().getInstrumentDate());

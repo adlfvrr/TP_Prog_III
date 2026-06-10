@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface FacultadRepository extends JpaRepository<Facultad, Long> {
 
-    public Optional<Facultad> findByCuit(String cuit);
+    Optional<Facultad> findByCuit(String cuit);
 
 }
