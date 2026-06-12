@@ -32,9 +32,18 @@ public class ApiClient {
 
             //Obtenemos el token de la sesión
             String token = this.getTokenFromSession();
-            //Ahora, si hay token, lo añadimos al header "Authorization" con el esquema "Bearer"
-            if (token != null || token.isEmpty()) {
-                request.getHeaders().setBearerAuth(token);
+
+            //Evitar enviar Authorization en endpoints de autenticación pública (login/register). Si la petición apunta a /auth/login o /auth/register,
+            //no añadimos el header
+            String path = request.getURI() != null ? request.getURI().getPath() : "";
+            boolean isAuthEndpoint = path != null && (path.endsWith("/auth/login") || path.endsWith("/auth/register"));
+
+            //Si no es un endpoint de autenticación (login - register)
+            if (!isAuthEndpoint) {
+                //Si existe un token no nulo y no vacío, lo añadimos al header "Authorization" con el esquema "Bearer"
+                if (token != null && !token.isEmpty()) {
+                    request.getHeaders().setBearerAuth(token);
+                }
             }
 
             //Retornamos la ejecución de la petición
