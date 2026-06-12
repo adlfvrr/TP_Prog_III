@@ -41,7 +41,7 @@ public class ApiClient {
             return execution.execute(request, body);
         });
         //Entonces, a la hora de realizar peticiones HTTP, le añadimos un filtro que verifica si hay un token JWT en la sesión de Vaadin.
-        //Si lo hay, lo añade automáticamente al header "Authorization" de cada petición.
+        //Si no hay, lo añade automáticamente a la sesión de Vaadin.
     }
 
     //Guardamos el token de la sesión. Se llamará después del login.
@@ -79,6 +79,20 @@ public class ApiClient {
     requestBody: Objeto Java que se envía como Request
     responseType: Clase de respuesta (Response)
      */
+
+    public <T> T get(String path, Class<T> responseType) {
+        HttpEntity<Void> entity = new HttpEntity<>(new HttpHeaders());
+
+        ResponseEntity<T> response = this.restTemplate.exchange(
+                API_BASE_URL + path,
+                HttpMethod.GET,
+                entity,
+                responseType
+        );
+
+        return response.getBody();
+    }
+
     public <T> T post(String path, Object requestBody, Class<T> responseType) {
         //Crear los headers de la petición
         HttpHeaders headers = new HttpHeaders();
@@ -99,12 +113,17 @@ public class ApiClient {
         return response.getBody();
     }
 
-    public <T> T get(String path, Class<T> responseType) {
-        HttpEntity<Void> entity = new HttpEntity<>(new HttpHeaders());
 
-        ResponseEntity<T> response = this.restTemplate.exchange(
+    public <T> T put(String path, Object requestBody, Class<T> responseType) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Object> entity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<T> response = restTemplate.exchange(
                 API_BASE_URL + path,
-                HttpMethod.GET,
+                HttpMethod.PUT,
                 entity,
                 responseType
         );
@@ -112,5 +131,19 @@ public class ApiClient {
         return response.getBody();
     }
 
-    //Más adelante los PUT y DELETE
+    public <T> T delete(String path, Class<T> responseType) { //No recibe requestBody, puesto que el delete se realiza mediante un recurso recibido en la URL
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers); //Pasa a ser Void, ya que un delete no devuelve nada
+
+        ResponseEntity<T> response = restTemplate.exchange(
+                API_BASE_URL + path,
+                HttpMethod.DELETE,
+                entity,
+                responseType
+        );
+
+        return response.getBody();
+    }
 }
