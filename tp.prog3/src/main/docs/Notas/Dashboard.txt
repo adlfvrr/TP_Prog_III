@@ -1,0 +1,7 @@
+Anotaciones para trabajar con la dashboard en el front
+
+La dashboard es la página principal de gestión. Dentro de ella se encontrarán las 4 entidades principales.
+La haré de manera que cada entidad tenga su propia sección, con un botón para crear nuevas instancias de esa entidad, y una tabla para mostrar las instancias existentes. Además, cada fila de la tabla tendrá botones para editar o eliminar.
+Sin embargo, se hará de la siguiente manera.
+EL usuario corriente podrá ver la dashboard y las entidades, pudiendo filtrar según su interés. Sin embargo no podrá realizar cambios en ella.
+El admin podrá interactuar y realizar modificaciones en la dashboard (es decir, interactuar con el crud completo).
