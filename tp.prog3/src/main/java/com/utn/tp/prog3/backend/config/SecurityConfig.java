@@ -1,0 +1,86 @@
+package com.utn.tp.prog3.backend.config;
+
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.time.LocalDateTime;
+
+@Configuration
+@EnableMethodSecurity
+@AllArgsConstructor
+public class SecurityConfig {
+
+    //Configuración de seguridad para las rutas
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    //Asignamos que tipo de encriptación de contraseñas utilizaremos dentro de nuestro Spring Security
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+
+    @Bean
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/api/**")
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // Configurar acceso a endpoints
+                .authorizeHttpRequests(auth -> auth
+                        // Endpoints públicos
+                        .requestMatchers("/api/auth/**").permitAll()
+                        // Admin solo para ciertos endpoints (lo manejaremos con anotaciones en controladores)
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(((request, response, authException) -> {
+                            response.setContentType("application/json;charset_UTF-8");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write(String.format("""
+                                    {
+                                    "timestamp": "%s",
+                                    "status": 401,  
+                                    "error": "Unauthorized",
+                                    "message": "Se requiere autenticacion para continuar"
+                                    }
+                                    """, LocalDateTime.now()));
+                        }))
+                        .accessDeniedHandler(((request, response, accessDeniedException) -> {
+                            response.setContentType("application/json;charset_UTF-8");
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.getWriter().write(String.format("""
+                                    {
+                                    "timestamp": "%s",
+                                    "status": 403,
+                                    "error": "Forbidden",
+                                    "message": "No tienes los permisos necesarios para continuar"
+                                    }
+                                    """, LocalDateTime.now()));
+                        })))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+
+    //Para Vaadin luego configuramos otro filtro
+}
