@@ -75,6 +75,20 @@ public class ApiClient {
         return this.getTokenFromSession();
     }
 
+    //Ahora, para posteriormente poder saber el usuario, guardaremos el nombre de usuario en la sesión de Vaadin.
+    public void saveUsername(String username){
+        VaadinSession session = VaadinSession.getCurrent();
+        if(session != null){
+            session.setAttribute("username", username);
+        }
+    }
+
+    public String getUsername(){
+        VaadinSession session = VaadinSession.getCurrent();
+
+        return session != null ? (String) session.getAttribute("username") : null;
+    }
+
     /*
     Ahora realizamos métodos HTTP genéricos, que serán ejecutados según la petición y la entidad, como también la response
     ¿Por qué genéricos? Porque al ser un cliente común, no sabemos qué tipo de entidad ni response vamos a manejar, por lo

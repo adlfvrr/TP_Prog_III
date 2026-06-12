@@ -49,16 +49,24 @@ public class AuthService {
 
         //Guardamos el token en nuestro apiClient
         this.apiClient.saveToken(token);
+
+        //Guardamos el username
+        apiClient.saveUsername(username);
     }
 
     //Logout, donde eliminamos el token
     public void logout(){
         this.apiClient.clearToken();
+        this.apiClient.saveUsername(null);
     }
 
     //Verificamos si un usuario está autenticado, si el token existe retorna true
     public boolean isAuthenticated(){
         return this.apiClient.getToken() != null && !this.apiClient.getToken().isEmpty();
+    }
+
+    public String getUsername(){
+        return this.apiClient.getUsername();
     }
 
 }
