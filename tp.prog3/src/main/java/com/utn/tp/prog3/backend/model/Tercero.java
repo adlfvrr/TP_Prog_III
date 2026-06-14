@@ -12,7 +12,7 @@ public class Tercero {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_tercero;
+    private Long id;
     @Column(name = "nombre", nullable = false, length = 70)
     private String nombre;
     @Column(name = "cuitl", nullable = false, length = 15)

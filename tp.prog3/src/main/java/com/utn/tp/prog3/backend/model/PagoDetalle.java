@@ -14,7 +14,7 @@ public class PagoDetalle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_pagosdetalle;
+    private Long id;
     @Column(name = "instrumentnumber", nullable = false, length = 15)
     private String instrumentNumber;
     @Column(name = "instrumentdate", nullable = false)

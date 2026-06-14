@@ -13,7 +13,7 @@ public class Facultad {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_facultad;
+    private Long id;
     @Column(nullable = false, name = "nombre", length = 70)
     private String nombre;
     @Column(nullable = false, name = "direccion", length = 100)

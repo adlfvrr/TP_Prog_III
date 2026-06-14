@@ -12,7 +12,7 @@ public class FacturaItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_items;
+    private Long id;
     @Column(nullable = false, name = "monto")
     private double monto;
     @Column(nullable = false, name = "cantidad")
