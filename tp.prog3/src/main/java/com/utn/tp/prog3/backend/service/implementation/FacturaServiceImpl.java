@@ -33,13 +33,13 @@ public class FacturaServiceImpl implements IFacturaService {
         return new FacturaResponse(
                 entity.getId(),
                 entity.getFecha_factura(),
-                entity.getTercero().getId_tercero(),
+                entity.getTercero().getId(),
                 entity.getNumero()
         );
     }
     private FacturaItemResponse mapFacturaItemToResponse(FacturaItem entity){
         return new FacturaItemResponse(
-                entity.getId_items(),
+                entity.getId(),
                 entity.getMonto(),
                 entity.getCantidad(),
                 entity.getFactura().getId(),
@@ -68,7 +68,7 @@ public class FacturaServiceImpl implements IFacturaService {
                     return new CompleteFacturaResponse(
                             factura.getId(),
                             factura.getFecha_factura(),
-                            factura.getTercero().getId_tercero(),
+                            factura.getTercero().getId(),
                             factura.getNumero(),
                             itemResponses
                     );
@@ -93,7 +93,7 @@ public class FacturaServiceImpl implements IFacturaService {
         return new CompleteFacturaResponse(
                 f.getId(),
                 f.getFecha_factura(),
-                f.getTercero().getId_tercero(),
+                f.getTercero().getId(),
                 f.getNumero(),
                 itemResponses
         );

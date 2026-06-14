@@ -24,7 +24,7 @@ public class FacultadServiceImpl implements IFacultadService {
     //Método mapper
     private FacultadResponse mapToResponse(Facultad entity){
         return new FacultadResponse(
-                entity.getId_facultad(),
+                entity.getId(),
                 entity.getNombre(),
                 entity.getDireccion(),
                 entity.getCuit(),

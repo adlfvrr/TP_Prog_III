@@ -31,7 +31,7 @@ public class PagoServiceImpl implements IPagoService {
     private PagoResponse mapToResponse(Pago entity){
         return new PagoResponse(
                 entity.getId(),
-                entity.getTercero().getId_tercero(),
+                entity.getTercero().getId(),
                 entity.getFecha_pago(),
                 entity.getMonto_pago(),
                 entity.getModo_pago()
@@ -40,7 +40,7 @@ public class PagoServiceImpl implements IPagoService {
 
     private PagoDetalleResponse mapToDetalleResponse(PagoDetalle entity){
         return new PagoDetalleResponse(
-                entity.getId_pagosdetalle(),
+                entity.getId(),
                 entity.getInstrumentNumber(),
                 entity.getInstrumentDate(),
                 entity.getBanco(),
@@ -63,7 +63,7 @@ public class PagoServiceImpl implements IPagoService {
                     PagoDetalleResponse detalleResponse = this.mapToDetalleResponse(this.pagoDetalleRepository.findByPagoId(pago.getId()));
                     return new CompletePagoResponse(
                             pago.getId(),
-                            pago.getTercero().getId_tercero(),
+                            pago.getTercero().getId(),
                             pago.getFecha_pago(),
                             pago.getMonto_pago(),
                             pago.getModo_pago(),
@@ -86,7 +86,7 @@ public class PagoServiceImpl implements IPagoService {
 
         return new CompletePagoResponse(
                 p.getId(),
-                p.getTercero().getId_tercero(),
+                p.getTercero().getId(),
                 p.getFecha_pago(),
                 p.getMonto_pago(),
                 p.getModo_pago(),
