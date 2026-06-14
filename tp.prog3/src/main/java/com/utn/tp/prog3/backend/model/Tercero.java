@@ -31,6 +31,6 @@ public class Tercero {
     @Column(name = "saldo_apertura")
     private double saldo_apertura;
     @Column(name = "tipo_saldo", length = 8)
-    private String tipo_saldo;
+    private String tipoSaldo;
 
 }
