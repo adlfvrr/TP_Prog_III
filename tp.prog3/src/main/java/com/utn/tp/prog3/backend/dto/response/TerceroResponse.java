@@ -1,16 +1,21 @@
 package com.utn.tp.prog3.backend.dto.response;
 
+import com.utn.tp.prog3.backend.model.SitIVA;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class TerceroResponse {
 
     private Long idTercero;
     private String nombre;
     private String cuitl;
-    private String sitIVA;
+    private SitIVA sitIVA;
     private String direccion;
     private String localidad;
     private String provincia;
@@ -18,18 +23,7 @@ public class TerceroResponse {
     private double saldo_apertura;
     private String tipo_saldo;
 
-    public TerceroResponse(Long id, String nombre, String cuit, String sitIVA, String direccion, String localidad, String provincia, String telefono, double saldo_apertura, String tipo_saldo){
-        this.idTercero = id;
-        this.nombre = nombre;
-        this.cuitl = cuit;
-        this.sitIVA = sitIVA;
-        this.direccion = direccion;
-        this.localidad = localidad;
-        this.provincia = provincia;
-        this.telefono = telefono;
-        this.saldo_apertura = saldo_apertura;
-        this.tipo_saldo = tipo_saldo;
-    }
+
 }
 /*
     DATOS A MOSTRAR EN EL RESPONSE
