@@ -5,7 +5,6 @@ import com.utn.tp.prog3.backend.dto.request.UpdateTerceroRequest;
 import com.utn.tp.prog3.backend.dto.response.TerceroResponse;
 import com.utn.tp.prog3.backend.exception.EntityAlreadyExistsException;
 import com.utn.tp.prog3.backend.exception.ResourceNotFoundException;
-import com.utn.tp.prog3.backend.model.SitIVA;
 import com.utn.tp.prog3.backend.model.Tercero;
 import com.utn.tp.prog3.backend.repository.TerceroRepository;
 import com.utn.tp.prog3.backend.service.Iservices.ITerceroService;
@@ -15,8 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -26,6 +23,7 @@ public class TerceroServiceImpl implements ITerceroService {
 
     //Método mapper
     private TerceroResponse mapToResponse(Tercero entity) {
+
         return new TerceroResponse(
                 entity.getId(),
                 entity.getNombre(),
@@ -41,35 +39,34 @@ public class TerceroServiceImpl implements ITerceroService {
     }
 
     @Override
-    public Page<TerceroResponse> findAll(String nombre, String cuit, SitIVA sitIVA, String direccion, String localidad, String provincia, String telefono, String tipo_saldo, Pageable page) {
+    public Page<TerceroResponse> findAll(String nombre, String cuit, String sitIVA, String direccion, String localidad, String provincia, String telefono, String tipo_saldo, Pageable page) {
         //Declaramos una página donde mostraremos los resultados y, filtraremos según el argumento que se reciba (para no complejizar tanto, haremos solo un filtrado)
         Page<Tercero> terceroPage;
 
-        if(nombre != null && !nombre.isEmpty()){
+        if (nombre != null && !nombre.isEmpty()) {
             terceroPage = this.terceroRepository.findByNombreContainingIgnoreCase(nombre, page);
         }
-        if(cuit != null && !cuit.isEmpty()){
+        else if (cuit != null && !cuit.isEmpty()) {
             terceroPage = this.terceroRepository.findByCuit(cuit, page);
         }
-        if(sitIVA != null){
+        else if (sitIVA != null && !sitIVA.isEmpty()) {
             terceroPage = this.terceroRepository.findBySitIVA(sitIVA, page);
         }
-        if(direccion != null && !direccion.isEmpty()){
+        else if (direccion != null && !direccion.isEmpty()) {
             terceroPage = this.terceroRepository.findByDireccionContainingIgnoreCase(direccion, page);
         }
-        if(localidad != null && !localidad.isEmpty()){
+        else if (localidad != null && !localidad.isEmpty()) {
             terceroPage = this.terceroRepository.findByLocalidadContainingIgnoreCase(localidad, page);
         }
-        if(provincia != null && !provincia.isEmpty()){
+        else if (provincia != null && !provincia.isEmpty()) {
             terceroPage = this.terceroRepository.findByProvinciaContainingIgnoreCase(provincia, page);
         }
-        if(telefono != null && !telefono.isEmpty()) {
+        else if (telefono != null && !telefono.isEmpty()) {
             terceroPage = this.terceroRepository.findByTelefono(telefono, page);
         }
-        if(tipo_saldo != null && !tipo_saldo.isEmpty()){
+        else if (tipo_saldo != null && !tipo_saldo.isEmpty()) {
             terceroPage = this.terceroRepository.findByTipoSaldoContainingIgnoreCase(tipo_saldo, page);
-        }
-        else{
+        } else {
             terceroPage = this.terceroRepository.findAll(page);
         }
         return terceroPage.map(this::mapToResponse);
@@ -100,7 +97,7 @@ public class TerceroServiceImpl implements ITerceroService {
         if (request.getCuitl() == null || request.getCuitl().isBlank()) {
             throw new IllegalArgumentException("El CUIT es obligatoria");
         }
-        if (request.getSitIVA() == null || request.getSitIVA().toString().isBlank()) {
+        if (request.getSitIVA() == null) {
             throw new IllegalArgumentException("La situación IVA es obligatoria");
         }
 
@@ -144,7 +141,7 @@ public class TerceroServiceImpl implements ITerceroService {
         if (!request.getProvincia().isBlank()) {
             t.setProvincia(request.getProvincia());
         }
-        if (!request.getSitIVA().toString().isBlank()) {
+        if (request.getSitIVA() != null) {
             t.setSitIVA(request.getSitIVA());
         }
         if (!request.getTelefono().isBlank()) {
@@ -160,6 +157,7 @@ public class TerceroServiceImpl implements ITerceroService {
         return this.mapToResponse(this.terceroRepository.save(t));
 
     }
+
     @Override
     public void deleteTercero(Long id) {
         if (id == null || id <= 0) {
