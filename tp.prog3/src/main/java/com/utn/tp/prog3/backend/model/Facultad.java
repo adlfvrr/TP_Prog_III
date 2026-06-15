@@ -21,13 +21,13 @@ public class Facultad {
     @Column(nullable = false, length = 15)
     private String cuit;
     @Column(nullable = false, name = "sucursal")
-    private int sucursal;
+    private Integer sucursal;
     @Column(name = "telefonos", length = 120)
     private String telefono;
     @Column(name = "email", length = 70)
     @Email
     private String email;
-    @Column(name = "defecto")
-    private boolean defecto = false;
+    @Column(name = "defecto", nullable = false)
+    private Boolean defecto = false;
 
 }
