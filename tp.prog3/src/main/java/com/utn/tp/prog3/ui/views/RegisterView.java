@@ -2,6 +2,7 @@ package com.utn.tp.prog3.ui.views;
 
 import com.utn.tp.prog3.ui.client.service.AuthService;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -10,7 +11,6 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import jakarta.validation.constraints.Email;
 
 @Route("register")
 @PageTitle("Registro de usuarios")
@@ -48,11 +48,10 @@ public class RegisterView extends VerticalLayout {
             }
         });
 
-        Button loginLink = new Button("¿Ya tienes una cuenta? Inicia sesión", event -> {
-            getUI().ifPresent(ui -> ui.navigate("login"));
-        });
+        Button loginLink = new Button("¿Ya tienes una cuenta? Inicia sesión", event -> getUI().ifPresent(ui -> ui.navigate("login")));
 
-        add(usernameField,
+        add(    new H1("Registro de usuario"),
+                usernameField,
                 emailField,
                 passwordField,
                 registerButton,
