@@ -1,6 +1,5 @@
 package com.utn.tp.prog3.backend.dto.response;
 
-import com.utn.tp.prog3.backend.model.SitIVA;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,7 @@ public class TerceroResponse {
     private Long idTercero;
     private String nombre;
     private String cuitl;
-    private SitIVA sitIVA;
+    private String sitIVA;
     private String direccion;
     private String localidad;
     private String provincia;

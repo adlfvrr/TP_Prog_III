@@ -1,6 +1,5 @@
 package com.utn.tp.prog3.backend.dto.request;
 
-import com.utn.tp.prog3.backend.model.SitIVA;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,7 @@ public class AddTerceroRequest {
     private String cuitl;
     @NotBlank(message = "El campo de situación IVA es obligatorio")
     @Size(max = 50)
-    private SitIVA sitIVA;
+    private String sitIVA;
     @NotBlank(message = "El campo de dirección es obligatorio")
     @Size(max = 70)
     private String direccion;
