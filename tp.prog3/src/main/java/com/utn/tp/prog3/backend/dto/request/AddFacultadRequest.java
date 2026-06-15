@@ -28,8 +28,6 @@ public class AddFacultadRequest {
     @Size(max = 70)
     @Email
     private String email;
-    private boolean defecto = false;
-
-
+    private Boolean defecto = false;
 
 }
