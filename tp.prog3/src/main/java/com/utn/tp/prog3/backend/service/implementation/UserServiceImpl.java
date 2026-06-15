@@ -55,7 +55,7 @@ public class UserServiceImpl implements IUserService {
             throw new IllegalArgumentException("Datos inválidos");
         }
 
-        String token = jwtTokenProvider.generateToken(user.getEmail(), user.getRole().name());
+        String token = jwtTokenProvider.generateToken(user.getUsername(), user.getRole().name());
         return new UserAuthResponse(token, user.getUsername(), user.getRole().name());
     }
 }
