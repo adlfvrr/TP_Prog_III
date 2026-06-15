@@ -3,12 +3,13 @@ package com.utn.tp.prog3.backend.service.Iservices;
 import com.utn.tp.prog3.backend.dto.request.AddFacultadRequest;
 import com.utn.tp.prog3.backend.dto.request.UpdateFacultadRequest;
 import com.utn.tp.prog3.backend.dto.response.FacultadResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 
 public interface IFacultadService {
 
-    List<FacultadResponse> findAll();
+    Page<FacultadResponse> findAll(String nombre, String direccion, String cuit, String telefono, String email, Pageable pageable);
     FacultadResponse addFacultad(AddFacultadRequest request);
     FacultadResponse updateFacultad(UpdateFacultadRequest request, Long id);
     FacultadResponse findById(Long id);
