@@ -9,11 +9,11 @@ import com.utn.tp.prog3.backend.model.Facultad;
 import com.utn.tp.prog3.backend.repository.FacultadRepository;
 import com.utn.tp.prog3.backend.service.Iservices.IFacultadService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -31,15 +31,34 @@ public class FacultadServiceImpl implements IFacultadService {
                 entity.getSucursal(),
                 entity.getTelefono(),
                 entity.getEmail(),
-                entity.isDefecto()
+                entity.getDefecto()
         );
     }
 
     @Override
-    public List<FacultadResponse> findAll() {
-        return this.facultadRepository.findAll().stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+    public Page<FacultadResponse> findAll(String nombre, String direccion, String cuit, String telefono, String email, Pageable pageable) {
+        Page<Facultad> pageFacultad;
+
+        if(nombre != null && !nombre.isEmpty()){
+            pageFacultad = this.facultadRepository.findByNombreContainingIgnoreCase(nombre, pageable);
+        }
+        else if(direccion != null && !direccion.isEmpty()){
+            pageFacultad = this.facultadRepository.findByDireccionContainingIgnoreCase(direccion, pageable);
+        }
+        else if(cuit != null && !cuit.isEmpty()){
+            pageFacultad = this.facultadRepository.findByCuitContainingIgnoreCase(cuit, pageable);
+        }
+        else if(telefono != null && !telefono.isEmpty()){
+            pageFacultad = this.facultadRepository.findByTelefonoContainingIgnoreCase(telefono, pageable);
+        }
+        else if(email != null && !email.isEmpty()){
+            pageFacultad = this.facultadRepository.findByEmailContainingIgnoreCase(email, pageable);
+        }
+        else{
+            pageFacultad = this.facultadRepository.findAll(pageable);
+        }
+
+        return pageFacultad.map(this::mapToResponse);
     }
 
     public FacultadResponse findById(Long id){
@@ -79,7 +98,7 @@ public class FacultadServiceImpl implements IFacultadService {
         f.setDireccion(request.getDireccion());
         f.setTelefono(request.getTelefono());
         f.setSucursal(request.getSucursal());
-        f.setDefecto(request.isDefecto());
+        f.setDefecto(request.getDefecto());
         //Guardamos
         return this.mapToResponse(facultadRepository.save(f));
     }
@@ -110,8 +129,8 @@ public class FacultadServiceImpl implements IFacultadService {
         if(request.getSucursal() != null){
             f.setSucursal(request.getSucursal());
         }
-        if(request.isDefecto() != f.isDefecto()){
-            f.setDefecto(request.isDefecto());
+        if(request.getDefecto() != null && !request.getDefecto().equals(f.getDefecto())){
+            f.setDefecto(request.getDefecto());
         }
 
         return this.mapToResponse(facultadRepository.save(f));
