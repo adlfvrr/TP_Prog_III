@@ -1,9 +1,12 @@
 package com.utn.tp.prog3.ui.client;
 
+import com.utn.tp.prog3.ui.dto.PageResponse;
 import com.vaadin.flow.server.VaadinSession;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+
 
 @Component
 public class ApiClient {
@@ -89,6 +92,20 @@ public class ApiClient {
         return session != null ? (String) session.getAttribute("username") : null;
     }
 
+    //Añadimos métodos para saber el rol del usuario dentro de la sesión (relevante para mostrar/ocultar componentes según el rol, como botones)
+
+    public void saveRole(String role){
+        VaadinSession session = VaadinSession.getCurrent();
+        if(session != null){
+            session.setAttribute("rol", role);
+        }
+    }
+
+    public String getRole(){
+        VaadinSession session = VaadinSession.getCurrent();
+        return session != null ? (String) session.getAttribute("rol") : null;
+    }
+
     /*
     Ahora realizamos métodos HTTP genéricos, que serán ejecutados según la petición y la entidad, como también la response
     ¿Por qué genéricos? Porque al ser un cliente común, no sabemos qué tipo de entidad ni response vamos a manejar, por lo
@@ -103,7 +120,22 @@ public class ApiClient {
     responseType: Clase de respuesta (Response)
      */
 
-    public <T> T get(String path, Class<T> responseType) {
+    //Usamos ParametrizedTypeReference para tipos genéricos como PageResponse
+    //Lo usamos porque Jackson no puede construir una instancia de PageImpl (Spring Data) a partir de JSON, por lo tanto debemos crear un DTO que permita a Jackson saber como deserializar (PageResponse)
+    public <T> PageResponse<T> get(String path, ParameterizedTypeReference<PageResponse<T>> responseType) {
+        HttpEntity<Void> entity = new HttpEntity<>(new HttpHeaders());
+
+        ResponseEntity<PageResponse<T>> response = this.restTemplate.exchange(
+                API_BASE_URL + path,
+                HttpMethod.GET,
+                entity,
+                responseType
+        );
+
+        return response.getBody();
+    }
+
+    public <T> T getById(String path, Class<T> responseType){
         HttpEntity<Void> entity = new HttpEntity<>(new HttpHeaders());
 
         ResponseEntity<T> response = this.restTemplate.exchange(
@@ -154,19 +186,7 @@ public class ApiClient {
         return response.getBody();
     }
 
-    public <T> T delete(String path, Class<T> responseType) { //No recibe requestBody, puesto que el delete se realiza mediante un recurso recibido en la URL
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Void> entity = new HttpEntity<>(headers); //Pasa a ser Void, ya que un delete no devuelve nada
-
-        ResponseEntity<T> response = restTemplate.exchange(
-                API_BASE_URL + path,
-                HttpMethod.DELETE,
-                entity,
-                responseType
-        );
-
-        return response.getBody();
+    public void delete(String path) { //No recibe requestBody, puesto que el delete se realiza mediante un recurso recibido en la URL
+        restTemplate.delete(API_BASE_URL + path);
     }
 }
