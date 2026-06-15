@@ -11,12 +11,12 @@ public class FacultadResponse {
     private String nombre;
     private String direccion;
     private String cuit;
-    private int sucursal;
+    private Integer sucursal;
     private String telefono;
     private String email;
-    private String defectos;
+    private Boolean defectos;
 
-    public FacultadResponse(Long id,String nombre, String direccion, String cuit, int sucursal, String telefono, String email, boolean defecto){
+    public FacultadResponse(Long id,String nombre, String direccion, String cuit, Integer sucursal, String telefono, String email, Boolean defecto){
         this.id = id;
         this.nombre = nombre;
         this.direccion = direccion;
@@ -24,7 +24,7 @@ public class FacultadResponse {
         this.sucursal = sucursal;
         this.telefono = telefono;
         this.email = email;
-        this.defectos = (!defecto) ? "Sin defectos" : "Con defectos";
+        this.defectos = defecto;
     }
 
 }
