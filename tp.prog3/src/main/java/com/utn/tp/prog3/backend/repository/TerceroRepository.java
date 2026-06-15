@@ -1,6 +1,5 @@
 package com.utn.tp.prog3.backend.repository;
 
-import com.utn.tp.prog3.backend.model.SitIVA;
 import com.utn.tp.prog3.backend.model.Tercero;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +12,7 @@ public interface TerceroRepository extends JpaRepository<Tercero, Long> {
     //Añadimos al repositorio los métodos necesarios para los filtrados
     Page<Tercero> findByNombreContainingIgnoreCase(String nombre, Pageable page);
     Page<Tercero> findByCuit(String cuit, Pageable page);
-    Page<Tercero> findBySitIVA(SitIVA sitIVA, Pageable page);
+    Page<Tercero> findBySitIVA(String sitIVA, Pageable page);
     Page<Tercero> findByDireccionContainingIgnoreCase(String direccion, Pageable page);
     Page<Tercero> findByLocalidadContainingIgnoreCase(String localidad, Pageable page);
     Page<Tercero> findByProvinciaContainingIgnoreCase(String provincia, Pageable page);
