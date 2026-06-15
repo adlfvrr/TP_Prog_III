@@ -6,12 +6,10 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayoutVariant;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.Lumo;
 
 
 @Route("login") // /ui/login
@@ -38,7 +36,7 @@ public class LoginView extends VerticalLayout {
             String username = usernameField.getValue();
             String password = passwordField.getValue();
 
-                authService.login(username, password);
+                this.authService.login(username, password);
                 // Si el login es exitoso, redirigir a la vista principal (aún no creada)
                 // Por ahora a una ruta temporal "dashboard" (la crearemos después)
                 getUI().ifPresent(ui -> ui.navigate("dashboard"));
@@ -47,9 +45,8 @@ public class LoginView extends VerticalLayout {
             }
         });
 
-        Button registerLink = new Button("¿Eres nuevo? Regístrate", event -> {
-            getUI().ifPresent(ui -> ui.navigate("register"));
-        });
+        Button registerLink = new Button("¿Eres nuevo? Regístrate", event -> getUI().ifPresent(ui -> ui.navigate("register")));
+
         registerLink.addClassName("link-button");
 
         add(
