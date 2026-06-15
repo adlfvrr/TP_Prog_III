@@ -17,6 +17,6 @@ public class UpdateFacultadRequest {
     private Integer sucursal;
     private String telefono;
     private String email;
-    private boolean defecto = false;
+    private Boolean defecto = false;
 
 }
