@@ -17,9 +17,8 @@ public class Tercero {
     private String nombre;
     @Column(name = "cuitl", nullable = false, length = 15)
     private String cuit;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "sitiva", nullable = false)
-    private SitIVA sitIVA;
+    @Column(name = "sitiva", nullable = false, length = 50)
+    private String sitIVA;
     @Column(name = "direccion", nullable = false, length = 70)
     private String direccion;
     @Column(name = "localidad", length = 70)
