@@ -52,6 +52,9 @@ public class AuthService {
 
         //Guardamos el username
         apiClient.saveUsername(username);
+
+        //Guardamos el rol
+        apiClient.saveRole(response.getRole());
     }
 
     //Logout, donde eliminamos el token
@@ -67,6 +70,11 @@ public class AuthService {
 
     public String getUsername(){
         return this.apiClient.getUsername();
+    }
+
+    //Agregamos método para saber si es Admin o no
+    public boolean isAdmin(){
+        return "ADMIN".equals(this.apiClient.getRole());
     }
 
 }
