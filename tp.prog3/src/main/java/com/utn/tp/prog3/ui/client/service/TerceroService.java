@@ -9,6 +9,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.List;
+
 @Service
 public class TerceroService {
 
@@ -62,4 +64,12 @@ public class TerceroService {
     public void delete(Long id) {
         apiClient.delete("/terceros/" + id);
     }
+
+    //Método para la view de Facturas, para poder ver todos los terceros
+    public List<TerceroResponse> findAllSimple() {
+        //Usamos una página grande.
+        PageResponse<TerceroResponse> page = findAll(null, null, null, null, null, null, null, null, 0, 1000);
+        return page.getContent();
+    }
+
 }
