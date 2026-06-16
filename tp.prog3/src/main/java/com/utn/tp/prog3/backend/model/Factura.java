@@ -16,12 +16,12 @@ public class Factura {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, name = "fecha_factura")
-    private Date fecha_factura;
+    private Date fechaFactura;
     @ManyToOne
     @JoinColumn(name = "id_tercero")
     private Tercero tercero;
     @Column(name = "numero")
-    private int numero;
+    private Integer numero;
 
 
 }
