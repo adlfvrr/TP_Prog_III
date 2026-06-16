@@ -1,6 +1,5 @@
 package com.utn.tp.prog3.backend.dto.request;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
