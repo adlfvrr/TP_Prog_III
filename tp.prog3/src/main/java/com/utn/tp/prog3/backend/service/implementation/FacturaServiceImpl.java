@@ -4,7 +4,6 @@ import com.utn.tp.prog3.backend.dto.request.AddFacturaItemRequest;
 import com.utn.tp.prog3.backend.dto.request.AddFacturaRequest;
 import com.utn.tp.prog3.backend.dto.response.CompleteFacturaResponse;
 import com.utn.tp.prog3.backend.dto.response.FacturaItemResponse;
-import com.utn.tp.prog3.backend.dto.response.FacturaResponse;
 import com.utn.tp.prog3.backend.exception.EntityAlreadyExistsException;
 import com.utn.tp.prog3.backend.exception.ResourceNotFoundException;
 import com.utn.tp.prog3.backend.model.Factura;
@@ -14,9 +13,13 @@ import com.utn.tp.prog3.backend.repository.FacturaRepository;
 import com.utn.tp.prog3.backend.repository.TerceroRepository;
 import com.utn.tp.prog3.backend.service.Iservices.IFacturaService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,14 +32,6 @@ public class FacturaServiceImpl implements IFacturaService {
     private TerceroRepository terceroRepository;
 
     //Método mapper
-    private FacturaResponse mapFacturaToResponse(Factura entity){
-        return new FacturaResponse(
-                entity.getId(),
-                entity.getFecha_factura(),
-                entity.getTercero().getId(),
-                entity.getNumero()
-        );
-    }
     private FacturaItemResponse mapFacturaItemToResponse(FacturaItem entity){
         return new FacturaItemResponse(
                 entity.getId(),
@@ -47,19 +42,27 @@ public class FacturaServiceImpl implements IFacturaService {
         );
     }
 
-    @Override
-    public List<FacturaResponse> findAll() {
-        return this.facturaRepository.findAll().stream()
-                .map(this::mapFacturaToResponse)
-                .collect(Collectors.toList());
-    }
 
     //Ahora un findAll y findById que me devuelva tanto facturas como sus items
 
     @Override
-    public List<CompleteFacturaResponse> findAllComplete(){
-        return this.facturaRepository.findAll().stream()
-                .map(factura -> { //Aplico lambda -un poco largo- para poder convertir los items y la factura en response y mapearlos
+    public Page<CompleteFacturaResponse> findAllComplete(Integer numero, String cuit, Date fechaFactura, Pageable pageable){
+        Page<Factura> facturaPage;
+
+        if(numero != null){
+            facturaPage = this.facturaRepository.findByNumero(numero, pageable);
+        }
+        else if(cuit != null && !cuit.isEmpty()){
+            facturaPage = this.facturaRepository.findByTerceroCuit(cuit, pageable);
+        }
+        else if(fechaFactura != null){
+            facturaPage = this.facturaRepository.findByFechaFactura(fechaFactura, pageable);
+        }
+        else{
+            facturaPage = this.facturaRepository.findAll(pageable);
+        }
+
+        return facturaPage.map(factura -> { //Aplico lambda -un poco largo- para poder convertir los items y la factura en response y mapearlos
                     //Mapeo y obtengo lista mapeada
                     List<FacturaItemResponse> itemResponses = this.facturaItemRepository.findByFacturaId(factura.getId()).stream()
                             .map(this::mapFacturaItemToResponse)
@@ -67,13 +70,12 @@ public class FacturaServiceImpl implements IFacturaService {
                     //Mapeo a CompleteFacturaResponse
                     return new CompleteFacturaResponse(
                             factura.getId(),
-                            factura.getFecha_factura(),
+                            factura.getFechaFactura(),
                             factura.getTercero().getId(),
                             factura.getNumero(),
                             itemResponses
                     );
-                })
-                .collect(Collectors.toList());
+                });
     }
 
     @Override
@@ -92,25 +94,17 @@ public class FacturaServiceImpl implements IFacturaService {
 
         return new CompleteFacturaResponse(
                 f.getId(),
-                f.getFecha_factura(),
+                f.getFechaFactura(),
                 f.getTercero().getId(),
                 f.getNumero(),
                 itemResponses
         );
 
     }
-    @Override
-    public FacturaResponse findById(Long id) {
-        if(id == null || id <= 0){
-            throw new IllegalArgumentException("El id no puede ser nulo/menor o igual a cero");
-        }
-        return this.mapFacturaToResponse(this.facturaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Factura no encontrada con id " + id)));
-    }
 
     @Transactional
     @Override
-    public FacturaResponse addFactura(AddFacturaRequest request) {
+    public CompleteFacturaResponse addFactura(AddFacturaRequest request) {
 
         //Comprobamos existencia de factura mediante su numero
         if(this.facturaRepository.findByNumero(request.getNumero()).isPresent()){
@@ -136,11 +130,14 @@ public class FacturaServiceImpl implements IFacturaService {
             throw new IllegalArgumentException("El id no puede ser nulo/menor o igual a cero");
         }
 
-        f.setFecha_factura(request.getFecha_factura());
+        f.setFechaFactura(request.getFecha_factura());
         f.setNumero(request.getNumero());
         f.setTercero(this.terceroRepository.findById(request.getId_tecero())
                 .orElseThrow(() -> new ResourceNotFoundException("Tercero no encontrado con id " + request.getId_tecero())));
         Factura savedEntity = this.facturaRepository.save(f);
+
+        //Instancianmos los itemResponses, para luego en la iteración ir añadiendolos y por último agregarlos al response final
+        List<FacturaItemResponse> itemResponses = new ArrayList<>();
 
         //Ahora recorremos los items y asignamos el id
         for(AddFacturaItemRequest itemRequest : request.getItemRequestList()){
@@ -163,9 +160,26 @@ public class FacturaServiceImpl implements IFacturaService {
             item.setMonto(itemRequest.getMonto());
             item.setDetalle(itemRequest.getDetalle());
             this.facturaItemRepository.save(item);
+
+            //Creamos los itemResponse para luego ir añadiendolos
+            FacturaItemResponse itemResponse = new FacturaItemResponse(
+                    item.getId(),
+                    item.getMonto(),
+                    item.getCantidad(),
+                    item.getFactura().getId(),
+                    item.getDetalle()
+            );
+            itemResponses.add(itemResponse);
         }
 
-        return this.mapFacturaToResponse(savedEntity);
+
+        return new CompleteFacturaResponse(
+                savedEntity.getId(),
+                savedEntity.getFechaFactura(),
+                savedEntity.getTercero().getId(),
+                savedEntity.getNumero(),
+                itemResponses
+        );
     }
 
     @Override
