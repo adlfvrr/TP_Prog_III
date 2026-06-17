@@ -35,7 +35,7 @@ public class FacultadController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')") // Solo usuarios con rol ADMIN pueden crear terceros
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FacultadResponse> crearFacultad(@RequestBody AddFacultadRequest request) {
         return ResponseEntity.ok(facultadService.addFacultad(request));
     }
