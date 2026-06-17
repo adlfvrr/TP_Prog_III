@@ -24,7 +24,7 @@ public class PagoDetalle {
     @Column(name = "pagorealizado")
     private boolean pagoRealizado = false;
     @ManyToOne
-    @JoinColumn(name = "id_pago")
+    @JoinColumn(name = "id_pagos")
     private Pago pago;
 
 }
