@@ -3,7 +3,6 @@ package com.utn.tp.prog3.backend.service.implementation;
 import com.utn.tp.prog3.backend.dto.request.AddPagoRequest;
 import com.utn.tp.prog3.backend.dto.response.CompletePagoResponse;
 import com.utn.tp.prog3.backend.dto.response.PagoDetalleResponse;
-import com.utn.tp.prog3.backend.dto.response.PagoResponse;
 import com.utn.tp.prog3.backend.dto.response.*;
 import com.utn.tp.prog3.backend.exception.ResourceNotFoundException;
 import com.utn.tp.prog3.backend.model.Pago;
@@ -13,11 +12,12 @@ import com.utn.tp.prog3.backend.repository.PagoRepository;
 import com.utn.tp.prog3.backend.repository.TerceroRepository;
 import com.utn.tp.prog3.backend.service.Iservices.IPagoService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Date;
 
 @Service
 @AllArgsConstructor
@@ -28,49 +28,46 @@ public class PagoServiceImpl implements IPagoService {
     private TerceroRepository terceroRepository;
 
     //Método mapper
-    private PagoResponse mapToResponse(Pago entity){
-        return new PagoResponse(
-                entity.getId(),
-                entity.getTercero().getId(),
-                entity.getFecha_pago(),
-                entity.getMonto_pago(),
-                entity.getModo_pago()
-        );
-    }
 
     private PagoDetalleResponse mapToDetalleResponse(PagoDetalle entity){
-        return new PagoDetalleResponse(
+        return entity != null ? new PagoDetalleResponse(
                 entity.getId(),
                 entity.getInstrumentNumber(),
                 entity.getInstrumentDate(),
                 entity.getBanco(),
                 entity.isPagoRealizado(),
                 entity.getPago().getId()
-        );
+        ) : null;
     }
 
     @Override
-    public List<PagoResponse> findAll() {
-        return this.pagoRepository.findAll().stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
+    public Page<CompletePagoResponse> findAllComplete(String cuit, String modoPago, Date fechaPago, Pageable pageable) {
+        Page<Pago> pagoPage;
 
-    @Override
-    public List<CompletePagoResponse> findAllComplete() {
-        return this.pagoRepository.findAll().stream()
-                .map(pago -> {
-                    PagoDetalleResponse detalleResponse = this.mapToDetalleResponse(this.pagoDetalleRepository.findByPagoId(pago.getId()));
-                    return new CompletePagoResponse(
-                            pago.getId(),
-                            pago.getTercero().getId(),
-                            pago.getFecha_pago(),
-                            pago.getMonto_pago(),
-                            pago.getModo_pago(),
-                            detalleResponse
-                    );
-                })
-                .collect(Collectors.toList());
+        if(cuit != null && !cuit.isEmpty()){
+            pagoPage = this.pagoRepository.findByTerceroCuitContainingIgnoreCase(cuit, pageable);
+        }
+        else if(modoPago != null && !modoPago.isEmpty()){
+            pagoPage = this.pagoRepository.findByModoPagoContainingIgnoreCase(modoPago, pageable);
+        }
+        else if(fechaPago != null){
+            pagoPage = this.pagoRepository.findByFechaPago(fechaPago, pageable);
+        }
+        else{
+            pagoPage = this.pagoRepository.findAll(pageable);
+        }
+
+        return pagoPage.map(pago -> {
+            PagoDetalleResponse detalleResponse = this.mapToDetalleResponse(this.pagoDetalleRepository.findByPagoId(pago.getId()));
+            return new CompletePagoResponse(
+                    pago.getId(),
+                    pago.getTercero().getId(),
+                    pago.getFechaPago(),
+                    pago.getMontoPago(),
+                    pago.getModoPago(),
+                    detalleResponse
+            );
+        });
     }
 
     @Override
@@ -87,25 +84,16 @@ public class PagoServiceImpl implements IPagoService {
         return new CompletePagoResponse(
                 p.getId(),
                 p.getTercero().getId(),
-                p.getFecha_pago(),
-                p.getMonto_pago(),
-                p.getModo_pago(),
+                p.getFechaPago(),
+                p.getMontoPago(),
+                p.getModoPago(),
                 detalleResponse
         );
     }
 
-    @Override
-    public PagoResponse findById(Long id) {
-        if(id == null || id <= 0){
-            throw new IllegalArgumentException("El id no puede ser nulo/menor o igual a cero");
-        }
-        return this.mapToResponse(this.pagoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Pago no encontrado con id " + id)));
-    }
-
     @Transactional
     @Override
-    public PagoResponse addPago(AddPagoRequest request) {
+    public CompletePagoResponse addPago(AddPagoRequest request) {
 
         //Creamos entidades
         Pago p = new Pago();
@@ -124,9 +112,9 @@ public class PagoServiceImpl implements IPagoService {
             throw new IllegalArgumentException("El id no puede ser nulo/menor o igual a cero");
         }
         // Asignamos y persistimos
-        p.setFecha_pago(request.getFecha_pago());
-        p.setModo_pago(request.getModo_pago());
-        p.setMonto_pago(request.getMonto_pago());
+        p.setFechaPago(request.getFecha_pago());
+        p.setModoPago(request.getModo_pago());
+        p.setMontoPago(request.getMonto_pago());
         p.setTercero(this.terceroRepository.findById(request.getId_tercero())
                 .orElseThrow(() -> new ResourceNotFoundException("Tercero no encontrado con id " + request.getId_tercero())));
         Pago savedEntity = this.pagoRepository.save(p); //Persistimos para obtener id
@@ -146,7 +134,13 @@ public class PagoServiceImpl implements IPagoService {
         pDetalle.setInstrumentNumber(request.getDetalleRequest().getInstrumentNumber());
         this.pagoDetalleRepository.save(pDetalle);
 
-        return this.mapToResponse(savedEntity);
+        return new CompletePagoResponse(savedEntity.getId(),
+                savedEntity.getTercero().getId(),
+                savedEntity.getFechaPago(),
+                savedEntity.getMontoPago(),
+                savedEntity.getModoPago(),
+                this.mapToDetalleResponse(pDetalle)
+                );
 
     }
 
