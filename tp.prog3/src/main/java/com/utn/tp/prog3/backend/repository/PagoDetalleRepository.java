@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PagoDetalleRepository extends JpaRepository<PagoDetalle, Long> {
 
-    PagoDetalle findByPagoId(Long id);
-
+    PagoDetalle findByPagoId(Long pagoId);
 
 }
