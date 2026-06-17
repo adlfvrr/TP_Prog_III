@@ -19,10 +19,10 @@ public class Pago {
     @JoinColumn(name = "id_tercero")
     private Tercero tercero;
     @Column(name = "fecha_pago", nullable = false)
-    private Date fecha_pago;
+    private Date fechaPago;
     @Column(name = "monto_pago")
-    private double monto_pago;
+    private double montoPago;
     @Column(name = "modo_pago", nullable = false, length = 20)
-    private String modo_pago;
+    private String modoPago;
 
 }
