@@ -59,7 +59,7 @@ public class FacturaService {
     public List<TerceroResponse> getTerceros() {
         // Usamos el endpoint de terceros con tamaño grande para obtener todos
         // Asumimos que el total de terceros es manejable (ej. < 1000)
-        String url = UriComponentsBuilder.fromPath("/tp/terceros")
+        String url = UriComponentsBuilder.fromPath("/terceros")
                 .queryParam("page", 0)
                 .queryParam("size", 1000)
                 .build()
