@@ -34,7 +34,7 @@ public class FacturaController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')") // Solo usuarios con rol ADMIN pueden crear terceros
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CompleteFacturaResponse> crearFactura(@RequestBody AddFacturaRequest request) {
         return ResponseEntity.ok(facturaService.addFactura(request));
     }
