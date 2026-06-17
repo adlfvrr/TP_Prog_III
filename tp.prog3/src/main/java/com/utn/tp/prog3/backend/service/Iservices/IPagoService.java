@@ -2,17 +2,16 @@ package com.utn.tp.prog3.backend.service.Iservices;
 
 import com.utn.tp.prog3.backend.dto.request.AddPagoRequest;
 import com.utn.tp.prog3.backend.dto.response.CompletePagoResponse;
-import com.utn.tp.prog3.backend.dto.response.PagoResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+import java.util.Date;
 
 public interface IPagoService {
 
-    List<PagoResponse> findAll();
-    List<CompletePagoResponse> findAllComplete();
+    Page<CompletePagoResponse> findAllComplete(String cuit, String modoPago, Date fechaPago, Pageable pageable);
     CompletePagoResponse findByIdComplete(Long idPago);
-    PagoResponse findById(Long id);
-    PagoResponse addPago(AddPagoRequest request);
+    CompletePagoResponse addPago(AddPagoRequest request);
     void deletePago(Long id);
 
 }
