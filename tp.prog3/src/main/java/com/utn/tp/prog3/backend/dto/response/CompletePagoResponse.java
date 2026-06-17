@@ -11,11 +11,11 @@ import java.util.Date;
 @Setter
 public class CompletePagoResponse {
 
-    private Long id_pagos;
-    private Long id_tercero;
-    private Date fecha_pago;
-    private double monto_pago;
-    private String modo_pago;
+    private Long idPago;
+    private Long idTercero;
+    private Date fechaPago;
+    private double montoPago;
+    private String modoPago;
     private PagoDetalleResponse detalleResponse;
 
 }
