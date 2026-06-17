@@ -53,7 +53,7 @@ public class FacturaServiceImpl implements IFacturaService {
             facturaPage = this.facturaRepository.findByNumero(numero, pageable);
         }
         else if(cuit != null && !cuit.isEmpty()){
-            facturaPage = this.facturaRepository.findByTerceroCuit(cuit, pageable);
+            facturaPage = this.facturaRepository.findByTerceroCuitContainingIgnoreCase(cuit, pageable);
         }
         else if(fechaFactura != null){
             facturaPage = this.facturaRepository.findByFechaFactura(fechaFactura, pageable);
