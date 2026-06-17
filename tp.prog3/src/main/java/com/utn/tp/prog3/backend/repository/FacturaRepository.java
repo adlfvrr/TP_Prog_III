@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface FacturaRepository extends JpaRepository<Factura, Long> {
 
     Page<Factura> findByNumero(Integer numero, Pageable pageable);
-    Page<Factura> findByTerceroCuit(String cuit, Pageable pageable);
+    Page<Factura> findByTerceroCuitContainingIgnoreCase(String cuit, Pageable pageable);
     Page<Factura> findByFechaFactura(Date fecha_Factura, Pageable pageable);
 
     Optional<Factura> findByNumero(int numero);
